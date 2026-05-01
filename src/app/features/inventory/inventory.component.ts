@@ -12,7 +12,32 @@ import { InventoryService, InventoryEntry, Group } from '../../services/inventor
     <div class="page">
       <div class="page-header">
         <h1>Inventory</h1>
+        <button class="btn-add-item" (click)="toggleAddForm()">
+          {{ showAddForm() ? 'Cancel' : '+ Add Item' }}
+        </button>
       </div>
+
+      @if (showAddForm()) {
+        <div class="add-form">
+          <div class="add-form-fields">
+            <div class="add-field">
+              <label>Icon</label>
+              <input type="text" [(ngModel)]="newIcon" placeholder="Paste emoji e.g. 🎯" maxlength="2" class="icon-input" />
+            </div>
+            <div class="add-field add-field-name">
+              <label>Item Name</label>
+              <input type="text" [(ngModel)]="newName" placeholder="e.g. Paper Towels" />
+            </div>
+          </div>
+          @if (addError()) {
+            <p class="add-error">{{ addError() }}</p>
+          }
+          <div class="add-form-actions">
+            <button class="btn-cancel-add" (click)="toggleAddForm()">Cancel</button>
+            <button class="btn-save-add" (click)="submitNewItem()">Add to {{ activeGroup() === 'little-kids' ? 'Little Kids' : 'Big Kids' }}</button>
+          </div>
+        </div>
+      }
 
       <div class="tabs">
         <button
@@ -39,23 +64,22 @@ import { InventoryService, InventoryEntry, Group } from '../../services/inventor
 
             @if (editingType() === entry.type) {
               <div class="edit-body">
-                <label class="qty-label">Quantity</label>
-                <input
-                  class="qty-input"
-                  type="number"
-                  [(ngModel)]="editQty"
-                  name="qty-{{ entry.type }}"
-                  min="0"
-                  autofocus
-                />
+                <label class="notes-label">Notes</label>
+                <textarea
+                  class="notes-textarea"
+                  [(ngModel)]="editNotes"
+                  name="notes-{{ entry.type }}"
+                  placeholder="e.g. Running low, need 2 boxes..."
+                  rows="3"
+                ></textarea>
                 <div class="edit-actions">
                   <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
                   <button class="btn-save" (click)="saveEdit(entry.type)">Save</button>
                 </div>
               </div>
             } @else {
-              <div class="qty-display" [class.qty-zero]="entry.quantity === 0" [class.qty-low]="entry.quantity > 0 && entry.quantity <= 5">
-                {{ entry.quantity }}
+              <div class="notes-display" [class.notes-empty]="!entry.notes">
+                {{ entry.notes || 'No notes yet' }}
               </div>
               <div class="updated">Updated {{ formatDate(entry.lastUpdated) }}</div>
               <button class="btn-edit" (click)="startEdit(entry)">Edit</button>
@@ -72,10 +96,114 @@ import { InventoryService, InventoryEntry, Group } from '../../services/inventor
       margin: 0 auto;
     }
 
+    .page-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
     .page-header h1 {
       margin: 0 0 1.5rem;
       color: #1e293b;
       font-size: 1.75rem;
+    }
+
+    .btn-add-item {
+      padding: 0.6rem 1.25rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      height: fit-content;
+      margin-bottom: 1.5rem;
+
+      &:hover { background: #5568d3; }
+    }
+
+    .add-form {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .add-form-fields {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .add-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .add-field label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+    }
+
+    .add-field input {
+      padding: 0.6rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: #1e293b;
+
+      &:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+      }
+    }
+
+    .add-field-name { flex: 1; }
+
+    .icon-input { width: 80px; text-align: center; font-size: 1.25rem; }
+
+    .add-error {
+      color: #dc2626;
+      font-size: 0.82rem;
+      margin: 0 0 0.75rem;
+    }
+
+    .add-form-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .btn-save-add {
+      padding: 0.5rem 1.25rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover { background: #5568d3; }
+    }
+
+    .btn-cancel-add {
+      padding: 0.5rem 1rem;
+      background: white;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      &:hover { background: #f9fafb; }
     }
 
     /* ── TABS ── */
@@ -150,20 +278,20 @@ import { InventoryService, InventoryEntry, Group } from '../../services/inventor
       font-size: 0.9rem;
     }
 
-    .qty-display {
-      font-size: 2.25rem;
-      font-weight: 700;
-      color: #22c55e;
-      line-height: 1;
-      margin: 0.25rem 0;
+    .notes-display {
+      font-size: 0.82rem;
+      color: #374151;
+      line-height: 1.4;
+      text-align: left;
+      width: 100%;
+      min-height: 3rem;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .qty-zero {
+    .notes-empty {
       color: #94a3b8;
-    }
-
-    .qty-low {
-      color: #f59e0b;
+      font-style: italic;
     }
 
     .updated {
@@ -198,23 +326,23 @@ import { InventoryService, InventoryEntry, Group } from '../../services/inventor
       margin-top: 0.25rem;
     }
 
-    .qty-label {
+    .notes-label {
       font-size: 0.8rem;
       color: #64748b;
       font-weight: 600;
       text-align: left;
     }
 
-    .qty-input {
+    .notes-textarea {
       width: 100%;
       padding: 0.5rem 0.625rem;
       border: 1px solid #d1d5db;
       border-radius: 6px;
-      font-size: 1.1rem;
-      font-weight: 700;
-      text-align: center;
+      font-size: 0.82rem;
+      font-family: inherit;
       box-sizing: border-box;
       color: #1e293b;
+      resize: vertical;
 
       &:focus {
         outline: none;
@@ -266,7 +394,11 @@ export class InventoryComponent {
 
   readonly activeGroup = signal<Group>('little-kids');
   readonly editingType = signal<string | null>(null);
-  editQty = 0;
+  readonly showAddForm = signal(false);
+  readonly addError = signal('');
+  editNotes = '';
+  newName = '';
+  newIcon = '';
 
   readonly visibleItems = computed(() =>
     this.svc.entries().filter(e => e.group === this.activeGroup())
@@ -278,15 +410,14 @@ export class InventoryComponent {
   }
 
   startEdit(entry: InventoryEntry) {
-    this.editQty = entry.quantity;
+    this.editNotes = entry.notes;
     this.editingType.set(entry.type);
   }
 
   async saveEdit(type: string) {
-    if (this.editQty < 0) return;
     const entry = this.visibleItems().find(e => e.type === type);
     if (!entry) return;
-    await this.svc.updateQuantity(entry.id, this.editQty);
+    await this.svc.updateNotes(entry.id, this.editNotes);
     this.editingType.set(null);
   }
 
@@ -294,8 +425,31 @@ export class InventoryComponent {
     this.editingType.set(null);
   }
 
+  toggleAddForm() {
+    this.showAddForm.update(v => !v);
+    this.newName = '';
+    this.newIcon = '';
+    this.addError.set('');
+  }
+
+  async submitNewItem() {
+    if (!this.newName.trim()) {
+      this.addError.set('Please enter an item name.');
+      return;
+    }
+    if (!this.newIcon.trim()) {
+      this.addError.set('Please enter an emoji icon.');
+      return;
+    }
+    await this.svc.addItem(this.activeGroup(), this.newName.trim(), this.newIcon.trim());
+    this.newName = '';
+    this.newIcon = '';
+    this.showAddForm.set(false);
+    this.addError.set('');
+  }
+
   formatDate(iso: string): string {
-    const d = new Date(iso);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const [year, month, day] = iso.split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   }
 }
