@@ -1,0 +1,17 @@
+<nav class="navbar">
+  <div class="navbar-container">
+    <a routerLink="/dashboard" class="navbar-brand">
+      🏢 Children's Ministry
+    </a>
+    <ul class="nav-links">
+      <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+      <li><a routerLink="/inventory" routerLinkActive="active">Inventory</a></li>
+      <li><a routerLink="/incident-report" routerLinkActive="active">Incidents</a></li>
+      <li><a routerLink="/check-in-sheet" routerLinkActive="active">Check-In</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
