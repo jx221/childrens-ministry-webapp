@@ -19,7 +19,8 @@
       "Bash(node -e ' *)",
       "Bash(mkdir -p public/icons)",
       "Bash(node -e \"const lock = require\\('./package-lock.json'\\); console.log\\(lock.packages['node_modules/@angular/service-worker'].version\\); console.log\\(lock.packages['node_modules/@angular/core'].version\\);\")",
-      "Bash(node -e \"const lock = require\\('./package-lock.json'\\); console.log\\('service-worker:', lock.packages['node_modules/@angular/service-worker'].version\\); console.log\\('core:', lock.packages['node_modules/@angular/core'].version\\);\")"
+      "Bash(node -e \"const lock = require\\('./package-lock.json'\\); console.log\\('service-worker:', lock.packages['node_modules/@angular/service-worker'].version\\); console.log\\('core:', lock.packages['node_modules/@angular/core'].version\\);\")",
+      "Bash(node -e \"const lock = require\\('./package-lock.json'\\); const keys = Object.keys\\(lock.packages\\).filter\\(k => k.includes\\('emnapi'\\)\\); console.log\\(keys.length ? keys.join\\('\\\\n'\\) : 'NOT FOUND'\\);\")"
     ]
   }
 }
