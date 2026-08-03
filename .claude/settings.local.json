@@ -17,7 +17,9 @@
       "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies['@angular/core']\\)\")",
       "Bash(node -e \"const a = require\\('./angular.json'\\); const b = a.projects['childrens-ministry-app'].architect.build; console.log\\(JSON.stringify\\(b.options, null, 2\\)\\)\")",
       "Bash(node -e ' *)",
-      "Bash(mkdir -p public/icons)"
+      "Bash(mkdir -p public/icons)",
+      "Bash(node -e \"const lock = require\\('./package-lock.json'\\); console.log\\(lock.packages['node_modules/@angular/service-worker'].version\\); console.log\\(lock.packages['node_modules/@angular/core'].version\\);\")",
+      "Bash(node -e \"const lock = require\\('./package-lock.json'\\); console.log\\('service-worker:', lock.packages['node_modules/@angular/service-worker'].version\\); console.log\\('core:', lock.packages['node_modules/@angular/core'].version\\);\")"
     ]
   }
 }
