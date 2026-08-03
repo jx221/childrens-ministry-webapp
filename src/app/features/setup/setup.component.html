@@ -1,0 +1,69 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Set Up & Tear Down</h1>
+    <button class="btn-reset" (click)="reset()">Reset All</button>
+  </div>
+
+  <div class="layout">
+    <!-- MAIN: Set Up + Tear Down -->
+    <div class="main-col">
+      @for (section of checklistSections; track section.title) {
+        <div class="section">
+          <div class="section-header">
+            <span class="section-emoji">{{ section.emoji }}</span>
+            <h2 class="section-title">{{ section.title }}</h2>
+            <span class="section-progress">
+              {{ sectionProgress(section).done }}/{{ sectionProgress(section).total }}
+            </span>
+          </div>
+
+          <div class="progress-bar-track">
+            <div
+              class="progress-bar-fill"
+              [style.width.%]="(sectionProgress(section).done / sectionProgress(section).total) * 100"
+            ></div>
+          </div>
+
+          <ul class="checklist">
+            @for (item of section.items; track item.id) {
+              <li class="checklist-item" [class.checked]="isChecked(item.id)" (click)="toggle(item.id)">
+                <div class="check-row">
+                  <div class="checkbox" [class.checked]="isChecked(item.id)">
+                    @if (isChecked(item.id)) {
+                      <svg viewBox="0 0 12 10" fill="none">
+                        <path d="M1 5l3.5 3.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    }
+                  </div>
+                  <span class="item-label">{{ item.label }}</span>
+                </div>
+                @if (item.sub && item.sub.length > 0) {
+                  <ul class="sub-list">
+                    @for (sub of item.sub; track sub) {
+                      <li class="sub-item">{{ sub }}</li>
+                    }
+                  </ul>
+                }
+              </li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+
+    <!-- SIDEBAR: Drop-Off Reminders -->
+    <aside class="sidebar">
+      <div class="reminder-card">
+        <div class="reminder-header">
+          <span>{{ reminders.emoji }}</span>
+          <h3>{{ reminders.title }}</h3>
+        </div>
+        <ul class="reminder-list">
+          @for (item of reminders.items; track item.id) {
+            <li class="reminder-item">{{ item.label }}</li>
+          }
+        </ul>
+      </div>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,236 @@
+.page {
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.page-header h1 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.75rem;
+}
+
+.btn-reset {
+  padding: 0.5rem 1.1rem;
+  background: white;
+  color: #64748b;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.btn-reset:hover { background: #fef2f2; color: #dc2626; border-color: #fca5a5; }
+
+/* ── LAYOUT ── */
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* ── MAIN CHECKLIST SECTIONS ── */
+.main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-emoji { font-size: 1.4rem; line-height: 1; }
+
+.section-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.section-progress {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #94a3b8;
+  background: #f1f5f9;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar-track {
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #667eea;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
+/* ── CHECKLIST ── */
+.checklist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.checklist-item {
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+}
+
+.checklist-item:hover { background: #f8fafc; }
+.checklist-item.checked { background: #f0fdf4; }
+
+.check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.checkbox {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #d1d5db;
+  border-radius: 5px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+  margin-top: 1px;
+}
+
+.checkbox.checked {
+  background: #22c55e;
+  border-color: #22c55e;
+}
+
+.checkbox svg { width: 12px; height: 10px; }
+
+.item-label {
+  font-size: 0.92rem;
+  color: #334155;
+  line-height: 1.5;
+  transition: color 0.15s;
+}
+
+.checklist-item.checked .item-label {
+  color: #86efac;
+  text-decoration: line-through;
+  text-decoration-color: #86efac;
+}
+
+.sub-list {
+  list-style: none;
+  margin: 0.5rem 0 0 2rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.sub-item {
+  font-size: 0.83rem;
+  color: #64748b;
+  padding-left: 0.75rem;
+  border-left: 2px solid #e2e8f0;
+  line-height: 1.5;
+}
+
+.checklist-item.checked .sub-item {
+  color: #86efac;
+  border-left-color: #bbf7d0;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  position: sticky;
+  top: 1.5rem;
+}
+
+.reminder-card {
+  background: #fffbeb;
+  border: 1.5px solid #fcd34d;
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.reminder-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.reminder-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #92400e;
+}
+
+.reminder-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.reminder-item {
+  font-size: 0.85rem;
+  color: #78350f;
+  line-height: 1.5;
+  padding-left: 1rem;
+  border-left: 3px solid #fcd34d;
+}
+
+@media (max-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+  }
+}

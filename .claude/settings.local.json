@@ -11,7 +11,13 @@
       "Bash(git add *)",
       "Bash(git commit *)",
       "Bash(git push *)",
-      "Bash(npm start *)"
+      "Bash(npm start *)",
+      "Bash(npx ng *)",
+      "Bash(npm install *)",
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies['@angular/core']\\)\")",
+      "Bash(node -e \"const a = require\\('./angular.json'\\); const b = a.projects['childrens-ministry-app'].architect.build; console.log\\(JSON.stringify\\(b.options, null, 2\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(mkdir -p public/icons)"
     ]
   }
 }

@@ -14,7 +14,7 @@ export interface InventoryEntry {
   icon: string;
   quantity: number;
   hot: boolean;
-  inCart: boolean;
+  amazonUrl: string;
   order: number;
   lastUpdated: string;
 }
@@ -38,10 +38,6 @@ export const ITEM_TYPES: { type: string; icon: string }[] = [
   { type: 'Paper Towels',       icon: '🧻' },
   { type: 'Other',              icon: '📦' },
 ];
-
-export const AMAZON_URLS: Record<string, string> = {
-  'Snacks': 'https://www.amazon.com/dp/B0C9VYRV8T',
-};
 
 const DEFAULT_HOT = new Set(['Snacks', 'Cups', 'Name Tags', 'Hand Sanitizer', 'Tissues']);
 
@@ -77,7 +73,7 @@ export class InventoryService {
             icon: data['icon'],
             quantity: data['quantity'] ?? 0,
             hot: data['hot'] !== undefined ? data['hot'] : DEFAULT_HOT.has(data['type']),
-            inCart: data['inCart'] ?? false,
+            amazonUrl: data['amazonUrl'] ?? '',
             order: data['order'] ?? 0,
             lastUpdated: data['lastUpdated'] ?? localDateString(),
           };
@@ -96,8 +92,8 @@ export class InventoryService {
     await updateDoc(doc(db, 'inventory', entryId), { hot });
   }
 
-  async setInCart(entryId: string, inCart: boolean): Promise<void> {
-    await updateDoc(doc(db, 'inventory', entryId), { inCart });
+  async setAmazonUrl(entryId: string, amazonUrl: string): Promise<void> {
+    await updateDoc(doc(db, 'inventory', entryId), { amazonUrl });
   }
 
   async deleteItem(entryId: string): Promise<void> {

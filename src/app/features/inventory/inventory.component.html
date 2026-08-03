@@ -1,0 +1,153 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Inventory</h1>
+    <button class="btn-add-item" (click)="toggleAddForm()">
+      {{ showAddForm() ? 'Cancel' : '+ Add Item' }}
+    </button>
+  </div>
+
+  @if (showAddForm()) {
+    <div class="add-form">
+      <div class="add-form-fields">
+        <div class="add-field">
+          <label>Icon</label>
+          @if (isImage(newIcon)) {
+            <div class="icon-preview-box">
+              <img [src]="newIcon" class="icon-img-preview" />
+              <button class="btn-clear-icon" (click)="newIcon = ''" type="button">✕</button>
+            </div>
+          } @else {
+            <input type="text" [(ngModel)]="newIcon" placeholder="Emoji or paste image" maxlength="2" class="icon-input" (paste)="onIconPaste($event)" />
+          }
+        </div>
+        <div class="add-field add-field-name">
+          <label>Item Name</label>
+          <input type="text" [(ngModel)]="newName" placeholder="e.g. Paper Towels" />
+        </div>
+        <div class="add-field add-field-url">
+          <label>Amazon URL <span class="label-optional">(optional)</span></label>
+          <input type="url" [(ngModel)]="newAmazonUrl" placeholder="https://amazon.com/dp/..." />
+        </div>
+      </div>
+      @if (addError()) {
+        <p class="add-error">{{ addError() }}</p>
+      }
+      <div class="add-form-actions">
+        <button class="btn-cancel-add" (click)="toggleAddForm()">Cancel</button>
+        <button class="btn-save-add" (click)="submitNewItem()" [disabled]="iconUploading()">
+          {{ iconUploading() ? 'Uploading image...' : 'Add to ' + (activeGroup() === 'little-kids' ? 'Little Kids' : 'Big Kids') }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="tabs">
+    <button class="tab-btn" [class.active]="activeGroup() === 'little-kids'" (click)="setGroup('little-kids')">Little Kids</button>
+    <button class="tab-btn" [class.active]="activeGroup() === 'big-kids'" (click)="setGroup('big-kids')">Big Kids</button>
+  </div>
+
+  <!-- HOT LIST -->
+  <div class="section-label">
+    <span>🔥 Hot List</span>
+    <span class="section-hint">Drag items here or use the pin button</span>
+  </div>
+  <div
+    class="grid drop-zone"
+    [class.drop-active]="hotDropActive()"
+    (dragover)="onSectionDragOver($event, 'hot')"
+    (dragleave)="onDragLeave($event, 'hot')"
+    (drop)="onSectionDrop($event, 'hot')"
+  >
+    @for (entry of hotItems(); track entry.id) {
+      <div
+        class="card"
+        draggable="true"
+        [class.dragging]="draggedId() === entry.id"
+        [class.drag-over]="dragOverId() === entry.id"
+        (dragstart)="onDragStart(entry)"
+        (dragend)="onDragEnd()"
+        (dragover)="onCardDragOver($event, entry)"
+        (dragleave)="dragOverId.set(null)"
+        (drop)="onCardDrop($event, entry)"
+      >
+        <div class="card-top-row">
+          <button class="btn-pin pinned" (click)="svc.setHot(entry.id, false)" title="Remove from hot list">📌</button>
+          @if (entry.amazonUrl) {
+            <a [href]="entry.amazonUrl" target="_blank" rel="noopener" class="btn-cart" title="Order on Amazon">🛒</a>
+          } @else {
+            <button class="btn-cart btn-cart-empty" (click)="promptAmazonUrl(entry)" title="Set Amazon link">🛒</button>
+          }
+        </div>
+        @if (isImage(entry.icon)) {
+          <img [src]="entry.icon" class="card-icon-img" />
+        } @else {
+          <div class="card-icon">{{ entry.icon }}</div>
+        }
+        <div class="card-name">{{ entry.type }}</div>
+        <div class="counter">
+          <button class="counter-btn" (click)="decrement(entry)" [disabled]="entry.quantity <= 0">−</button>
+          <span class="counter-value" [class.zero]="entry.quantity === 0">{{ entry.quantity }}</span>
+          <button class="counter-btn" (click)="increment(entry)">+</button>
+        </div>
+        <button class="btn-reset-item" (click)="resetItem(entry)" [disabled]="entry.quantity === 0">Reset</button>
+        <div class="updated">Updated {{ formatDate(entry.lastUpdated) }}</div>
+        <button class="btn-delete-item" (click)="deleteItem(entry.id)" title="Delete item">✕</button>
+      </div>
+    }
+    @if (hotItems().length === 0) {
+      <div class="drop-hint">Drop items here to add to hot list</div>
+    }
+  </div>
+
+  <!-- MORE ITEMS -->
+  <button class="more-header" (click)="moreExpanded.update(v => !v)">
+    <span>More Items ({{ moreItems().length }})</span>
+    <span class="chevron" [class.open]="moreExpanded()">▼</span>
+  </button>
+
+  @if (moreExpanded()) {
+    <div
+      class="grid drop-zone more-zone"
+      [class.drop-active]="moreDropActive()"
+      (dragover)="onSectionDragOver($event, 'more')"
+      (dragleave)="onDragLeave($event, 'more')"
+      (drop)="onSectionDrop($event, 'more')"
+    >
+      @for (entry of moreItems(); track entry.id) {
+        <div
+          class="card"
+          draggable="true"
+          [class.dragging]="draggedId() === entry.id"
+          [class.drag-over]="dragOverId() === entry.id"
+          (dragstart)="onDragStart(entry)"
+          (dragend)="onDragEnd()"
+          (dragover)="onCardDragOver($event, entry)"
+          (dragleave)="dragOverId.set(null)"
+          (drop)="onCardDrop($event, entry)"
+        >
+          <div class="card-top-row">
+            <button class="btn-pin" (click)="svc.setHot(entry.id, true)" title="Add to hot list">📌</button>
+            @if (entry.amazonUrl) {
+              <a [href]="entry.amazonUrl" target="_blank" rel="noopener" class="btn-cart" title="Order on Amazon">🛒</a>
+            } @else {
+              <button class="btn-cart btn-cart-empty" (click)="promptAmazonUrl(entry)" title="Set Amazon link">🛒</button>
+            }
+          </div>
+          @if (isImage(entry.icon)) {
+            <img [src]="entry.icon" class="card-icon-img" />
+          } @else {
+            <div class="card-icon">{{ entry.icon }}</div>
+          }
+          <div class="card-name">{{ entry.type }}</div>
+          <div class="counter">
+            <button class="counter-btn" (click)="decrement(entry)" [disabled]="entry.quantity <= 0">−</button>
+            <span class="counter-value" [class.zero]="entry.quantity === 0">{{ entry.quantity }}</span>
+            <button class="counter-btn" (click)="increment(entry)">+</button>
+          </div>
+          <button class="btn-reset-item" (click)="resetItem(entry)" [disabled]="entry.quantity === 0">Reset</button>
+          <div class="updated">Updated {{ formatDate(entry.lastUpdated) }}</div>
+        </div>
+      }
+    </div>
+  }
+</div>

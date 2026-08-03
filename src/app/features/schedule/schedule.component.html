@@ -1,0 +1,135 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Schedule</h1>
+    <div class="header-actions">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search your name..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+        />
+        @if (searchQuery()) {
+          <button class="search-clear" (click)="searchQuery.set('')">✕</button>
+        }
+      </div>
+      <button class="btn-add" (click)="openAddForm()">+ Add</button>
+    </div>
+  </div>
+
+  <!-- ADD FORM -->
+  @if (showAddForm()) {
+    <div class="form-overlay" (click)="showAddForm.set(false)"></div>
+    <div class="add-form">
+      <div class="form-header">
+        <h2>Add to Schedule</h2>
+        <button class="btn-close" (click)="showAddForm.set(false)">✕</button>
+      </div>
+      <div class="form-fields">
+        <div class="form-field">
+          <label>Name</label>
+          <input type="text" [(ngModel)]="newName" placeholder="e.g. Bri Mancino" />
+        </div>
+        <div class="form-field">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="newDate" />
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Role</label>
+            <select [(ngModel)]="newRole">
+              <option value="helper">Helper</option>
+              <option value="lead-teacher">Lead Teacher</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>Group</label>
+            <select [(ngModel)]="newGroup">
+              <option value="littles">Littles</option>
+              <option value="bigs">Bigs</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      @if (addError) {
+        <p class="form-error">{{ addError }}</p>
+      }
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="showAddForm.set(false)">Cancel</button>
+        <button class="btn-save" (click)="submitEntry()">Save</button>
+      </div>
+    </div>
+  }
+
+  <!-- SEARCH RESULTS -->
+  @if (isSearching()) {
+    <div class="search-results">
+      <h2 class="results-title">
+        Schedule for "{{ searchQuery() }}"
+        <span class="results-count">{{ searchResults().length }} date{{ searchResults().length !== 1 ? 's' : '' }}</span>
+      </h2>
+      @if (searchResults().length === 0) {
+        <p class="no-results">No schedule entries found for that name.</p>
+      } @else {
+        <div class="results-list">
+          @for (entry of searchResults(); track entry.id) {
+            <div class="result-row">
+              <div class="result-date">{{ formatDate(entry.date) }}</div>
+              <div class="result-name">{{ entry.name }}</div>
+              <span class="badge role-{{ entry.role }}">{{ roleLabel(entry.role) }}</span>
+              <span class="badge group-{{ entry.group }}">{{ groupLabel(entry.group) }}</span>
+              <button class="btn-delete" (click)="deleteEntry(entry.id)" title="Remove">✕</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- CALENDAR -->
+  @if (!isSearching()) {
+    <div class="calendar-nav">
+      <button class="nav-btn" (click)="prevMonth()">‹</button>
+      <span class="month-label">{{ monthLabel() }}</span>
+      <button class="nav-btn" (click)="nextMonth()">›</button>
+    </div>
+
+    <div class="calendar">
+      @for (day of weekdays; track day) {
+        <div class="weekday-header">{{ day }}</div>
+      }
+
+      @for (day of calendarDays(); track $index) {
+        <div
+          class="day-cell"
+          [class.empty]="!day.date"
+          [class.today]="day.isToday"
+          [class.past]="day.isPast"
+          (click)="day.dateStr && openAddForm(day.dateStr)"
+        >
+          @if (day.date) {
+            <div class="day-number">{{ day.date }}</div>
+            <div class="day-entries">
+              @for (entry of entriesForDate(day.dateStr!); track entry.id) {
+                <div class="entry-chip" [class]="'role-' + entry.role">
+                  <span class="chip-name">{{ entry.name }}</span>
+                  <span class="chip-group">{{ groupLabel(entry.group) }}</span>
+                  <button class="chip-delete" (click)="$event.stopPropagation(); deleteEntry(entry.id)">✕</button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="legend-dot role-lead-teacher"></span>Lead Teacher</span>
+      <span class="legend-item"><span class="legend-dot role-helper"></span>Helper</span>
+      <span class="legend-item"><span class="legend-dot group-bigs"></span>Bigs</span>
+      <span class="legend-item"><span class="legend-dot group-littles"></span>Littles</span>
+    </div>
+  }
+</div>
