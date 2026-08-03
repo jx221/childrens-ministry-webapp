@@ -24,19 +24,11 @@ import { RouterLink } from '@angular/router';
           <a routerLink="/incident-report" class="widget-link">File a Report</a>
         </div>
 
-        <div class="widget-card">
-          <h2>✅ Check-In Sheet</h2>
-          <p>Track children and families. Secure PIN-based pickup verification.</p>
-          <a routerLink="/check-in-sheet" class="widget-link">Open Sheet</a>
-        </div>
-      </div>
-
       <div class="quick-links">
         <h3>Quick Actions</h3>
         <ul>
           <li><a routerLink="/inventory">View Supplies</a></li>
           <li><a routerLink="/incident-report">Recent Incidents</a></li>
-          <li><a routerLink="/check-in-sheet">Check-In Sheet</a></li>
         </ul>
       </div>
     </div>

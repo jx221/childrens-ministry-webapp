@@ -1,8 +1,7 @@
 import { Injectable, signal, inject, PLATFORM_ID, NgZone } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import {
-  collection, onSnapshot, doc, addDoc, updateDoc,
-  writeBatch,
+  collection, onSnapshot, doc, updateDoc, deleteDoc, writeBatch,
 } from 'firebase/firestore';
 import { db } from '../firebase';
 
@@ -13,7 +12,10 @@ export interface InventoryEntry {
   group: Group;
   type: string;
   icon: string;
-  notes: string;
+  quantity: number;
+  hot: boolean;
+  inCart: boolean;
+  order: number;
   lastUpdated: string;
 }
 
@@ -37,13 +39,15 @@ export const ITEM_TYPES: { type: string; icon: string }[] = [
   { type: 'Other',              icon: '📦' },
 ];
 
+export const AMAZON_URLS: Record<string, string> = {
+  'Snacks': 'https://www.amazon.com/dp/B0C9VYRV8T',
+};
+
+const DEFAULT_HOT = new Set(['Snacks', 'Cups', 'Name Tags', 'Hand Sanitizer', 'Tissues']);
+
 function localDateString(): string {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function entryDocId(group: Group, type: string): string {
-  return `${group}__${type.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -61,62 +65,50 @@ export class InventoryService {
   }
 
   private subscribe() {
-    onSnapshot(collection(db, 'inventory'), async snapshot => {
-      const existingIds = new Set(snapshot.docs.map(d => d.id));
-      const batch = writeBatch(db);
-      let needsBatch = false;
-
-      for (const group of ['little-kids', 'big-kids'] as Group[]) {
-        for (const item of ITEM_TYPES) {
-          const id = entryDocId(group, item.type);
-          if (!existingIds.has(id)) {
-            batch.set(doc(db, 'inventory', id), {
-              group,
-              type: item.type,
-              icon: item.icon,
-              notes: '',
-              lastUpdated: localDateString(),
-            });
-            needsBatch = true;
-          }
-        }
-      }
-
-      if (needsBatch) {
-        await batch.commit();
-        return;
-      }
-
-      const entries: InventoryEntry[] = snapshot.docs.map(d => {
-        const data = d.data();
-        return {
-          id: d.id,
-          group: data['group'],
-          type: data['type'],
-          icon: data['icon'],
-          notes: data['notes'] ?? '',
-          lastUpdated: data['lastUpdated'] ?? localDateString(),
-        };
-      });
-
+    onSnapshot(collection(db, 'inventory'), snapshot => {
+      const entries: InventoryEntry[] = snapshot.docs
+        .filter(d => !d.id.startsWith('_'))
+        .map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            group: data['group'],
+            type: data['type'],
+            icon: data['icon'],
+            quantity: data['quantity'] ?? 0,
+            hot: data['hot'] !== undefined ? data['hot'] : DEFAULT_HOT.has(data['type']),
+            inCart: data['inCart'] ?? false,
+            order: data['order'] ?? 0,
+            lastUpdated: data['lastUpdated'] ?? localDateString(),
+          };
+        });
       this.zone.run(() => this._entries.set(entries));
+    }, error => {
+      console.error('[InventoryService] Firestore error:', error.code, error.message);
     });
   }
 
-  async updateNotes(entryId: string, notes: string): Promise<void> {
-    await updateDoc(doc(db, 'inventory', entryId), {
-      notes,
-      lastUpdated: localDateString(),
-    });
+  async updateQuantity(entryId: string, quantity: number): Promise<void> {
+    await updateDoc(doc(db, 'inventory', entryId), { quantity, lastUpdated: localDateString() });
   }
 
-  async addItem(group: Group, type: string, icon: string): Promise<void> {
-    await addDoc(collection(db, 'inventory'), {
-      group,
-      type,
-      icon,
-      notes: '',
-      lastUpdated: localDateString(),
-    });
+  async setHot(entryId: string, hot: boolean): Promise<void> {
+    await updateDoc(doc(db, 'inventory', entryId), { hot });
+  }
+
+  async setInCart(entryId: string, inCart: boolean): Promise<void> {
+    await updateDoc(doc(db, 'inventory', entryId), { inCart });
+  }
+
+  async deleteItem(entryId: string): Promise<void> {
+    await deleteDoc(doc(db, 'inventory', entryId));
+  }
+
+  async reorderSection(updates: { id: string; order: number; hot: boolean }[]): Promise<void> {
+    const batch = writeBatch(db);
+    for (const { id, order, hot } of updates) {
+      batch.update(doc(db, 'inventory', id), { order, hot });
+    }
+    await batch.commit();
   }
 }

@@ -28,13 +28,7 @@ export const routes: Routes = [
         m => m.IncidentReportComponent
       )
   },
-  {
-    path: 'check-in-sheet',
-    loadComponent: () =>
-      import('./features/check-in-sheet/check-in-sheet.component').then(
-        m => m.CheckInSheetComponent
-      )
-  },
+
   {
     path: '**',
     redirectTo: '/dashboard'
