@@ -5,14 +5,28 @@ import { db } from '../firebase';
 
 export type ScheduleRole = 'helper' | 'lead-teacher';
 export type ScheduleGroup = 'bigs' | 'littles';
+export type EntryType = 'serving' | 'event';
 
 export interface ScheduleEntry {
   id: string;
+  type: EntryType;
   name: string;
   date: string; // YYYY-MM-DD
-  role: ScheduleRole;
-  group: ScheduleGroup;
+  role?: ScheduleRole;
+  group?: ScheduleGroup;
+  color?: string;
 }
+
+export const EVENT_COLORS = [
+  { label: 'Purple',  value: '#7c3aed' },
+  { label: 'Blue',    value: '#2563eb' },
+  { label: 'Teal',    value: '#0891b2' },
+  { label: 'Green',   value: '#16a34a' },
+  { label: 'Yellow',  value: '#ca8a04' },
+  { label: 'Orange',  value: '#ea580c' },
+  { label: 'Red',     value: '#dc2626' },
+  { label: 'Pink',    value: '#db2777' },
+];
 
 @Injectable({ providedIn: 'root' })
 export class ScheduleService {
@@ -34,10 +48,12 @@ export class ScheduleService {
         const data = d.data();
         return {
           id: d.id,
+          type: data['type'] ?? 'serving',
           name: data['name'],
           date: data['date'],
           role: data['role'],
           group: data['group'],
+          color: data['color'],
         };
       });
       this.zone.run(() => this._entries.set(entries));

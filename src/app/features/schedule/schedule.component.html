@@ -24,35 +24,75 @@
     <div class="form-overlay" (click)="showAddForm.set(false)"></div>
     <div class="add-form">
       <div class="form-header">
-        <h2>Add to Schedule</h2>
+        <h2>Add to Calendar</h2>
         <button class="btn-close" (click)="showAddForm.set(false)">✕</button>
       </div>
+
+      <!-- TYPE TOGGLE -->
+      <div class="type-toggle">
+        <button class="type-btn" [class.active]="newType === 'serving'" (click)="newType = 'serving'">Serving Day</button>
+        <button class="type-btn" [class.active]="newType === 'event'" (click)="newType = 'event'">Special Event</button>
+      </div>
+
       <div class="form-fields">
         <div class="form-field">
-          <label>Name</label>
-          <input type="text" [(ngModel)]="newName" placeholder="e.g. Bri Mancino" />
+          <label>{{ newType === 'serving' ? 'Name' : 'Event Title' }}</label>
+          <input type="text" [(ngModel)]="newName" [placeholder]="newType === 'serving' ? 'e.g. Bri Mancino' : 'e.g. Easter Sunday'" />
         </div>
         <div class="form-field">
           <label>Date</label>
           <input type="date" [(ngModel)]="newDate" />
         </div>
-        <div class="form-row">
-          <div class="form-field">
-            <label>Role</label>
-            <select [(ngModel)]="newRole">
-              <option value="helper">Helper</option>
-              <option value="lead-teacher">Lead Teacher</option>
-            </select>
+
+        @if (newType === 'serving') {
+          <div class="form-row">
+            <div class="form-field">
+              <label>Role</label>
+              <select [(ngModel)]="newRole">
+                <option value="helper">Helper</option>
+                <option value="lead-teacher">Lead Teacher</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Group</label>
+              <select [(ngModel)]="newGroup">
+                <option value="littles">Littles</option>
+                <option value="bigs">Bigs</option>
+              </select>
+            </div>
           </div>
-          <div class="form-field">
-            <label>Group</label>
-            <select [(ngModel)]="newGroup">
-              <option value="littles">Littles</option>
-              <option value="bigs">Bigs</option>
-            </select>
+        }
+
+        <div class="form-field">
+          <label>Color <span class="label-optional">(optional)</span></label>
+          <div class="color-swatches">
+            <button
+              class="color-swatch swatch-none"
+              [class.selected]="newColor === ''"
+              (click)="newColor = ''"
+              title="Default"
+            >✕</button>
+            @for (c of eventColors; track c.value) {
+              <button
+                class="color-swatch"
+                [style.background]="c.value"
+                [class.selected]="newColor === c.value"
+                (click)="newColor = c.value"
+                [title]="c.label"
+              ></button>
+            }
+            <label class="color-swatch swatch-custom" title="Custom color">
+              <input
+                type="color"
+                [value]="newColor || '#667eea'"
+                (input)="newColor = $any($event.target).value"
+              />
+              🎨
+            </label>
           </div>
         </div>
       </div>
+
       @if (addError) {
         <p class="form-error">{{ addError }}</p>
       }
@@ -78,8 +118,8 @@
             <div class="result-row">
               <div class="result-date">{{ formatDate(entry.date) }}</div>
               <div class="result-name">{{ entry.name }}</div>
-              <span class="badge role-{{ entry.role }}">{{ roleLabel(entry.role) }}</span>
-              <span class="badge group-{{ entry.group }}">{{ groupLabel(entry.group) }}</span>
+              <span class="badge role-{{ entry.role }}">{{ roleLabel(entry.role!) }}</span>
+              <span class="badge group-{{ entry.group }}">{{ groupLabel(entry.group!) }}</span>
               <button class="btn-delete" (click)="deleteEntry(entry.id)" title="Remove">✕</button>
             </div>
           }
@@ -113,11 +153,29 @@
             <div class="day-number">{{ day.date }}</div>
             <div class="day-entries">
               @for (entry of entriesForDate(day.dateStr!); track entry.id) {
-                <div class="entry-chip" [class]="'role-' + entry.role">
-                  <span class="chip-name">{{ entry.name }}</span>
-                  <span class="chip-group">{{ groupLabel(entry.group) }}</span>
-                  <button class="chip-delete" (click)="$event.stopPropagation(); deleteEntry(entry.id)">✕</button>
-                </div>
+                @if (entry.type === 'event') {
+                  <div
+                    class="entry-chip event-chip"
+                    [style.background]="eventBg(entry.color!)"
+                    [style.color]="entry.color"
+                    [style.border-color]="entry.color"
+                  >
+                    <span class="chip-name">{{ entry.name }}</span>
+                    <button class="chip-delete" (click)="$event.stopPropagation(); deleteEntry(entry.id)">✕</button>
+                  </div>
+                } @else {
+                  <div
+                    class="entry-chip"
+                    [class]="entry.color ? 'custom-color' : 'role-' + entry.role"
+                    [style.background]="entry.color ? eventBg(entry.color) : null"
+                    [style.color]="entry.color || null"
+                    [style.border-color]="entry.color || null"
+                  >
+                    <span class="chip-name">{{ entry.name }}</span>
+                    <span class="chip-group">{{ groupLabel(entry.group!) }}</span>
+                    <button class="chip-delete" (click)="$event.stopPropagation(); deleteEntry(entry.id)">✕</button>
+                  </div>
+                }
               }
             </div>
           }

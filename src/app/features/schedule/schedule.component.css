@@ -126,6 +126,103 @@
 
 .btn-close:hover { color: #334155; }
 
+/* ── TYPE TOGGLE ── */
+.type-toggle {
+  display: flex;
+  background: #f1f5f9;
+  border-radius: 8px;
+  padding: 3px;
+  margin-bottom: 1.25rem;
+  gap: 3px;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 0.45rem 0.5rem;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.type-btn.active {
+  background: white;
+  color: #1e293b;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ── COLOR SWATCHES ── */
+.color-swatches {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,0,0,0.35);
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+  outline: none;
+}
+
+.color-swatch:hover { transform: scale(1.15); }
+
+.color-swatch.selected {
+  border-color: transparent;
+  transform: scale(1.1);
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #1e293b;
+}
+
+.swatch-none {
+  background: #f1f5f9 !important;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swatch-custom {
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  cursor: pointer;
+  position: relative;
+}
+
+.swatch-custom input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+
+.label-optional {
+  font-weight: 400;
+  color: #94a3b8;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+}
+
+.entry-chip.custom-color {
+  border: 1px solid;
+  font-weight: 700;
+}
+
 .form-fields { display: flex; flex-direction: column; gap: 0.875rem; }
 
 .form-field {
@@ -380,6 +477,12 @@
 
 .entry-chip.role-lead-teacher { background: #eef2ff; color: #4338ca; }
 .entry-chip.role-helper { background: #f0f9ff; color: #0369a1; }
+
+.event-chip {
+  border: 1px solid;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
 
 .chip-name {
   flex: 1;

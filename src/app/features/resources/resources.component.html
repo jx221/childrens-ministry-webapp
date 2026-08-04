@@ -1,12 +1,7 @@
 <div class="page">
   <div class="page-header">
     <h1>Resources</h1>
-    <div class="header-actions">
-      <button class="btn-edit" (click)="toggleEdit()">
-        {{ editMode() ? 'Done' : 'Edit Contacts' }}
-      </button>
-      <button class="btn-print" onclick="window.print()">Print</button>
-    </div>
+    <button class="btn-print" onclick="window.print()">Print</button>
   </div>
 
   <!-- DOCUMENTS -->
@@ -38,97 +33,4 @@
     </div>
   </section>
 
-  <!-- PARENT CONTACTS -->
-  <section class="section">
-    <div class="contact-header">
-      <h2 class="section-title">Parents' Contact Info</h2>
-      <p class="contact-note">For questions: <strong>Bri Mancino</strong> — 716-710-2211</p>
-    </div>
-
-    <!-- FAMILIES -->
-    <h3 class="group-label">Families</h3>
-    <table class="contact-table">
-      <thead>
-        <tr>
-          <th>Parent</th>
-          <th>Children</th>
-          <th>Phone</th>
-          @if (editMode()) { <th></th> }
-        </tr>
-      </thead>
-      <tbody>
-        @for (c of familyContacts(); track c.id) {
-          <tr>
-            @if (editMode()) {
-              <td><input class="cell-input" [value]="c.parent" (blur)="save(c, 'parent', $any($event.target).value)" /></td>
-              <td><input class="cell-input" [value]="c.children" (blur)="save(c, 'children', $any($event.target).value)" /></td>
-              <td><input class="cell-input" [value]="c.phone" (blur)="save(c, 'phone', $any($event.target).value)" /></td>
-              <td><button class="btn-delete-row" (click)="delete(c.id)" title="Remove">✕</button></td>
-            } @else {
-              <td>{{ c.parent }}</td>
-              <td>{{ c.children }}</td>
-              <td><a [href]="phoneHref(c.phone)">{{ c.phone }}</a></td>
-            }
-          </tr>
-        }
-      </tbody>
-    </table>
-
-    @if (editMode()) {
-      @if (addingGroup() === 'families') {
-        <div class="add-row-form">
-          <input class="add-input" [(ngModel)]="newParent" placeholder="Parent name" />
-          <input class="add-input" [(ngModel)]="newChildren" placeholder="Children" />
-          <input class="add-input" [(ngModel)]="newPhone" placeholder="Phone" />
-          <button class="btn-confirm-add" (click)="submitAdd()">Add</button>
-          <button class="btn-cancel-add" (click)="cancelAdd()">Cancel</button>
-        </div>
-      } @else {
-        <button class="btn-add-row" (click)="openAdd('families')">+ Add Family</button>
-      }
-    }
-
-    <!-- VISITORS -->
-    <h3 class="group-label visitors">Visitors</h3>
-    <table class="contact-table">
-      <thead>
-        <tr>
-          <th>Parent</th>
-          <th>Children</th>
-          <th>Phone</th>
-          @if (editMode()) { <th></th> }
-        </tr>
-      </thead>
-      <tbody>
-        @for (c of visitorContacts(); track c.id) {
-          <tr>
-            @if (editMode()) {
-              <td><input class="cell-input" [value]="c.parent" (blur)="save(c, 'parent', $any($event.target).value)" /></td>
-              <td><input class="cell-input" [value]="c.children" (blur)="save(c, 'children', $any($event.target).value)" /></td>
-              <td><input class="cell-input" [value]="c.phone" (blur)="save(c, 'phone', $any($event.target).value)" /></td>
-              <td><button class="btn-delete-row" (click)="delete(c.id)" title="Remove">✕</button></td>
-            } @else {
-              <td>{{ c.parent }}</td>
-              <td>{{ c.children }}</td>
-              <td><a [href]="phoneHref(c.phone)">{{ c.phone }}</a></td>
-            }
-          </tr>
-        }
-      </tbody>
-    </table>
-
-    @if (editMode()) {
-      @if (addingGroup() === 'visitors') {
-        <div class="add-row-form">
-          <input class="add-input" [(ngModel)]="newParent" placeholder="Parent name" />
-          <input class="add-input" [(ngModel)]="newChildren" placeholder="Children" />
-          <input class="add-input" [(ngModel)]="newPhone" placeholder="Phone" />
-          <button class="btn-confirm-add" (click)="submitAdd()">Add</button>
-          <button class="btn-cancel-add" (click)="cancelAdd()">Cancel</button>
-        </div>
-      } @else {
-        <button class="btn-add-row" (click)="openAdd('visitors')">+ Add Visitor</button>
-      }
-    }
-  </section>
 </div>
