@@ -8,6 +8,9 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "functions": {
+    "source": "functions"
+  },
   "apphosting": {
     "backendId": "childrens-ministry-backend",
     "rootDir": "/",

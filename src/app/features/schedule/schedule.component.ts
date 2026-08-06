@@ -1,6 +1,7 @@
-import { Component, signal, computed, inject } from '@angular/core';
+import { Component, signal, computed, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { isPlatformBrowser } from '@angular/common';
 import { ScheduleService, ScheduleEntry, ScheduleRole, ScheduleGroup, EntryType, EVENT_COLORS } from '../../services/schedule.service';
 
 interface CalendarDay {
@@ -20,6 +21,10 @@ interface CalendarDay {
 export class ScheduleComponent {
   readonly svc = inject(ScheduleService);
   readonly eventColors = EVENT_COLORS;
+  private platformId = inject(PLATFORM_ID);
+
+  readonly slackSending = signal(false);
+  readonly slackResult = signal<{ ok: boolean; msg: string } | null>(null);
 
   readonly currentDate = signal(new Date());
   readonly showAddForm = signal(false);
@@ -132,6 +137,24 @@ export class ScheduleComponent {
 
   deleteEntry(id: string) {
     this.svc.deleteEntry(id);
+  }
+
+  async sendToSlack() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    this.slackSending.set(true);
+    this.slackResult.set(null);
+    try {
+      const { getFunctions, httpsCallable } = await import('firebase/functions');
+      const { app } = await import('../../firebase');
+      const fn = httpsCallable(getFunctions(app), 'triggerScheduleMessage');
+      const res: any = await fn();
+      this.slackResult.set({ ok: true, msg: res.data.message });
+    } catch (err: any) {
+      this.slackResult.set({ ok: false, msg: err.message ?? 'Failed to send' });
+    } finally {
+      this.slackSending.set(false);
+      setTimeout(() => this.slackResult.set(null), 4000);
+    }
   }
 
   formatDate(dateStr: string): string {

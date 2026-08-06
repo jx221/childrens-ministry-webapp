@@ -84,6 +84,33 @@
 
 .btn-add:hover { background: #5568d3; }
 
+.btn-slack {
+  padding: 0.55rem 1.1rem;
+  background: #4a154b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-slack:hover:not(:disabled) { background: #611f69; }
+.btn-slack:disabled { opacity: 0.6; cursor: default; }
+
+.slack-toast {
+  padding: 0.65rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.toast-ok  { background: #dcfce7; color: #166534; }
+.toast-err { background: #fee2e2; color: #991b1b; }
+
 /* ── ADD FORM ── */
 .form-overlay {
   position: fixed;

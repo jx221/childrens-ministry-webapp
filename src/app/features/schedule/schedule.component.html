@@ -16,8 +16,17 @@
         }
       </div>
       <button class="btn-add" (click)="openAddForm()">+ Add</button>
+      <button class="btn-slack" (click)="sendToSlack()" [disabled]="slackSending()">
+        {{ slackSending() ? 'Sending...' : '📤 Send to Slack' }}
+      </button>
     </div>
   </div>
+
+  @if (slackResult()) {
+    <div class="slack-toast" [class.toast-ok]="slackResult()!.ok" [class.toast-err]="!slackResult()!.ok">
+      {{ slackResult()!.ok ? '✓' : '✕' }} {{ slackResult()!.msg }}
+    </div>
+  }
 
   <!-- ADD FORM -->
   @if (showAddForm()) {
